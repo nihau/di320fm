@@ -79,25 +79,25 @@ namespace di320fm
         /// <param name="newKey">gimme your key brah, i know you got it</param>
         private static void ChangeListenKey(string newKey)
         {
+            var stations = JsonConvert.DeserializeObject<IEnumerable<Station>>("http://listen.di.fm/public3".GetStringAsync().Result);
             const string plsFile = "Digitally Imported.pls";
 
             string text = String.Empty;
 
-            if (!File.Exists(plsFile))
+            var sb = new StringBuilder();
+            sb.AppendLine("[playlist]");
+            sb.AppendLine("NumberOfEntries=" + stations.Count());
+            var ij = 0;
+            foreach(var station in stations)
             {
-                var assembly = Assembly.GetExecutingAssembly();
-                const string resourceName = "di320fm." + plsFile;
+                ij++;
+                sb.AppendLine(String.Format(@"File{0}=http://prem2.di.fm:80/{1}_hi?09f33f12640bf313a5737e1e", ij, station.Key));
+                sb.AppendLine(String.Format("Title{0}=Digitally Imported - {1}", ij, station.Name));
+                sb.AppendLine(String.Format("Length{0}=-1", ij));
+            }
+            sb.AppendLine("Version=2");
 
-                using (var stream = assembly.GetManifestResourceStream(resourceName))
-                using (var reader = new StreamReader(stream))
-                {
-                    text = reader.ReadToEnd();
-                }
-            }
-            else
-            {
-                text = File.ReadAllText(plsFile);   
-            }
+            text = sb.ToString();
 
             int i = -1;
 
