@@ -88,7 +88,7 @@ namespace di320fm
             sb.AppendLine("[playlist]");
             sb.AppendLine("NumberOfEntries=" + stations.Count());
             var ij = 0;
-            foreach(var station in stations)
+            foreach(var station in stations.OrderBy(x => x.Name))
             {
                 ij++;
                 sb.AppendLine(String.Format(@"File{0}=http://prem2.di.fm:80/{1}_hi?09f33f12640bf313a5737e1e", ij, station.Key));
