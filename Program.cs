@@ -91,7 +91,7 @@ namespace di320fm
             foreach(var station in stations.OrderBy(x => x.Name))
             {
                 ij++;
-                sb.AppendLine(String.Format(@"File{0}=http://prem2.di.fm:80/{1}_hi?09f33f12640bf313a5737e1e", ij, station.Key));
+                sb.AppendLine(String.Format(@"File{0}=http://prem1.di.fm:80/{1}_hi?09f33f12640bf313a5737e1e", ij, station.Key));
                 sb.AppendLine(String.Format("Title{0}=Digitally Imported - {1}", ij, station.Name));
                 sb.AppendLine(String.Format("Length{0}=-1", ij));
             }
