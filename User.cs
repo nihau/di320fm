@@ -18,4 +18,10 @@ namespace di320fm
         [JsonProperty("confirmation_token")]
         public string ConfirmationToken { get; set; }
     }
+
+    class TrialAvailability
+    {
+        [JsonProperty("allowed")]
+        public bool Allowed { get; set; }
+    }
 }

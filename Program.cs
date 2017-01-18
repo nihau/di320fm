@@ -49,28 +49,58 @@ namespace di320fm
                 var jsonResponse = response.Result.Content.ReadAsStringAsync();
                 me = JsonConvert.DeserializeObject<User>(jsonResponse.Result);
 
-                //confirmation
-                "http://www.di.fm/member/confirm/".AppendPathSegment(me.ConfirmationToken).GetAsync().Wait();
-
-                //activate trial 
-                var trialGet =
-                    UserUri.AppendPathSegment("/1/subscriptions/trial/premium-pass")
-                    .SetQueryParams(new { api_key = me.ApiKey })
-                    .WithBasicAuth("ephemeron", "dayeiph0ne@pp")
-                    .PostAsync()
-                    .ReceiveJson();
-
-                //must login after activating
-                "https://api.audioaddict.com/v1/di/members/authenticate"
+                var login = "https://api.audioaddict.com/v1/di/members/authenticate"
                     .SetQueryParams(new { api_key = me.ApiKey })
                     .WithBasicAuth("ephemeron", "dayeiph0ne@pp")
                     .PostAsync()
                     .ReceiveJson()
-                    .Wait();
+                    .Result;
+
+                //confirmation
+                var confirmation = "http://www.di.fm/member/confirm/"
+                    .AppendPathSegment(me.ConfirmationToken)
+                    .GetAsync()
+                    .Result;
+
+                login = "https://api.audioaddict.com/v1/di/members/authenticate"
+                    .SetQueryParams(new { api_key = me.ApiKey })
+                    .WithBasicAuth("ephemeron", "dayeiph0ne@pp")
+                    .PostAsync()
+                    .ReceiveJson()
+                    .Result;
+
+                var canTrial = UserUri.AppendPathSegment("/1/subscriptions/trial_allowed/premium-pass")
+                    .SetQueryParams(new { api_key = me.ApiKey })
+                    .WithBasicAuth("ephemeron", "dayeiph0ne@pp")
+                    .GetAsync()
+                    .ReceiveJson<TrialAvailability>()
+                    .Result;
+
+                if (canTrial.Allowed)
+                {
+                	//activate trial 
+                    var trial =
+                        UserUri.AppendPathSegment("/1/subscriptions/trial/premium-pass")
+                        .SetQueryParams(new { api_key = me.ApiKey })
+                        .WithBasicAuth("ephemeron", "dayeiph0ne@pp")
+                        .PostAsync()
+                        .ReceiveJson()
+                        .Result;
+                }
+
+                //must login after activating
+                login = "https://api.audioaddict.com/v1/di/members/authenticate"
+                    .SetQueryParams(new { api_key = me.ApiKey })
+                    .WithBasicAuth("ephemeron", "dayeiph0ne@pp")
+                    .PostAsync()
+                    .ReceiveJson()
+                    .Result;
             }
 
             Console.WriteLine("New key " + me.ListenKey);
             ChangeListenKey(me.ListenKey);
+            Console.WriteLine($"{email}");
+            Console.WriteLine($"{password}");
         }
 
         /// <summary>
@@ -91,7 +121,7 @@ namespace di320fm
             foreach(var station in stations.OrderBy(x => x.Name))
             {
                 ij++;
-                sb.AppendLine(String.Format(@"File{0}=http://prem1.di.fm:80/{1}_hi?09f33f12640bf313a5737e1e", ij, station.Key));
+                sb.AppendLine(String.Format(@"File{0}=http://prem2.di.fm:80/{1}_hi?09f33f12640bf313a5737e1e", ij, station.Key));
                 sb.AppendLine(String.Format("Title{0}=Digitally Imported - {1}", ij, station.Name));
                 sb.AppendLine(String.Format("Length{0}=-1", ij));
             }
